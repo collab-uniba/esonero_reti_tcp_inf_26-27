@@ -82,7 +82,12 @@ def reference_response(frm, to, value):
 def recv_exactly(sock, n):
     data = b""
     while len(data) < n:
-        chunk = sock.recv(n - len(data))
+        try:
+            chunk = sock.recv(n - len(data))
+        except socket.timeout:
+            if data:  # partial message: report its length instead of a generic timeout
+                break
+            raise
         if not chunk:
             break
         data += chunk
