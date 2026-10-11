@@ -50,7 +50,7 @@ CASES = [
     ("lb kg 1000.01", "Valore non valido", "Richiesta 'lb kg 1000.01' dal client ip 127.0.0.1"),
 ]
 
-USAGE_CASES = ["mile km 10", "m km 1.234", "m km 10,50", "m km -5", "m km"]
+USAGE_CASES = ["mile km 10", "m km 1.234", "m km 10,50", "m km -5", "m km 42949673", "m km"]
 
 BYTE_ORDER_HINT = "sembra un errore di byte order: hai usato htonl()/ntohl()?"
 

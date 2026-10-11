@@ -105,7 +105,7 @@ Server avviato con `server-project`. La colonna **Log server** riporta l'output 
 | `"g kg 0"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'g kg 0.00' dal client ip 127.0.0.1` |
 | `"lb kg 1000.01"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'lb kg 1000.01' dal client ip 127.0.0.1` |
 
-Se l'argomento di `-r` non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore negativo, non numerico o con più di due decimali, campi mancanti), il client **non contatta il server**, stampa
+Se l'argomento di `-r` non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore negativo, non numerico, con più di due decimali o troppo grande per `uint32_t`, campi mancanti), il client **non contatta il server**, stampa
 
 ```
 Uso: client-project [-s server] [-p port] -r "FROM TO valore"
@@ -115,7 +115,7 @@ ed esce con codice di uscita diverso da 0.
 
 > [!WARNING]
 > L'output deve corrispondere **carattere per carattere** a quello degli esempi: lingua italiana, spazi, punteggiatura, due cifre decimali, nessun messaggio aggiuntivo su `stdout`.
-> Se il server non è raggiungibile o la risposta non è valida, il client stampa un errore ed esce con codice di uscita diverso da 0.
+> Se il server non è raggiungibile o la risposta non è valida (codice di stato sconosciuto), il client stampa un errore ed esce con codice di uscita diverso da 0.
 
 ## 6. Requisiti
 
