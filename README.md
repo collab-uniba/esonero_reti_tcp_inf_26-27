@@ -1,6 +1,6 @@
-# Template Esonero TCP - Corso di Reti di Calcolatori - CORSO A.A.
+# Esonero TCP - Corso di Reti di Calcolatori - Informatica 2026-27
 
-Template repository per l'assegnazione della prima prova di esonero: client-server TCP.
+Repository per l'assegnazione della prima prova di esonero: client-server TCP.
 
 
 ## Descrizione
@@ -9,10 +9,12 @@ Questo repository contiene la struttura base per lo sviluppo di un'applicazione 
 
 ## Struttura del Repository
 
-Il repository è organizzato in due progetti Eclipse CDT separati:
+Il repository è organizzato in due progetti Eclipse CDT separati, più la cartella della verifica automatica:
 
 ```
 .
+├── .github/                # Verifica automatica (GitHub Actions), non modificare
+│
 ├── client-project/         # Progetto Eclipse per il client
 │   ├── .project            # Configurazione progetto Eclipse
 │   ├── .cproject           # Configurazione Eclipse CDT
@@ -28,7 +30,7 @@ Il repository è organizzato in due progetti Eclipse CDT separati:
         └── protocol.h      # Header con definizioni e prototipi
 ```
 
-## Come Utilizzare il Template
+## Come Utilizzare il Repository
 
 ### 1. Creare la propria copia del repository
 
@@ -72,18 +74,9 @@ Per compilare su Windows, è necessario linkare la libreria Winsock. Per ciascun
 ## File Principali
 
 ### protocol.h
-Contiene:
-- **Costanti condivise**: numero di porta del server, dimensione buffer, ecc.
-- **Prototipi delle funzioni**: inserire qui le firme di tutte le funzioni implementate
-
-Esempio:
-```c
-#define SERVER_PORT 27015
-#define BUFFER_SIZE 512
-
-// Prototipo funzione esempio
-int connect_to_server(const char* server_address);
-```
+È identico nei due progetti e contiene:
+- **Definizioni del protocollo** (già fornite, **non modificare**): strutture dei messaggi, codici di stato, costanti condivise
+- **Prototipi delle funzioni**: inserire qui le firme delle funzioni implementate
 
 ### main.c (Client e Server)
 Contiene:
@@ -93,33 +86,28 @@ Contiene:
 - Solo nel server: la disabilitazione del buffering di `stdout` (`setvbuf`), che garantisce la stampa immediata del log; non rimuoverla
 
 ### Eseguire client e server con argomenti
-Per passare gli argomenti da riga di comando all'interno di Eclipse:
+Per passare gli argomenti da riga di comando (es. `-r "mi km 26.2"`) all'interno di Eclipse:
 1. `Run → Run Configurations…`
 2. Selezionare la configurazione del progetto sotto **C/C++ Application**
 3. Nella scheda **Arguments**, inserire gli argomenti in **Program arguments** e cliccare `Run`
 
 In alternativa, eseguire il file compilato da terminale (si trova nella cartella `Debug/` del progetto).
 
-## Implementazione dell'Assegnazione
+## Specifiche dell'Assegnazione
 
-Gli studenti devono:
+[Protocollo applicativo e istruzioni per la consegna](Assegnazione.md)
 
-1. **Definire i parametri** nel file `protocol.h`:
-   - Numero di porta dell'applicazione
-   - Dimensione dei buffer
-   - Altre costanti necessarie
+## Verifica Automatica
 
-2. **Implementare le funzioni** necessarie:
-   - Aggiungere i prototipi nel file `protocol.h`
-   - Implementare le funzioni nel file `main.c`
+A ogni `git push`, GitHub compila client e server su **Windows, Linux e macOS** e li verifica con alcuni esempi presi dall'assegnazione.
 
-3. **Completare il codice** seguendo le sezioni TODO:
-   - **Client**: creazione socket, connessione al server, invio/ricezione dati
-   - **Server**: creazione socket, bind, listen, accept, gestione client
-
-### Note
-
-- Utilizzare le costanti definite in `protocol.h` invece di valori hardcoded
+- L'esito compare nella scheda **Actions** del vostro repository e accanto a ogni commit (✅ superato, ❌ fallito).
+- In caso di fallimento, aprite l'esecuzione e consultate la pagina **Summary**: per ogni verifica fallita è indicato cosa era atteso e cosa è stato ricevuto.
+- La verifica automatica serve a intercettare subito gli errori evidenti (codice che non compila su un sistema operativo, formato di output errato, byte order). **Superarla non garantisce** il superamento della correzione finale, che usa ulteriori casi di test.
+- Non modificate la cartella `.github/`.
+- Non serve alcuna configurazione: la verifica si attiva da sola nel repository creato con "Use this template".
+- **È normale che le prime esecuzioni falliscano** (e che GitHub vi invii un'email di notifica) finché client e server non sono implementati.
+- Se la scheda **Actions** mostra che i workflow sono disabilitati (ad es. perché avete creato un fork invece di usare il template), abilitateli da lì oppure da _Settings → Actions → General → Allow all actions and reusable workflows_.
 
 ## Salvare e Caricare le Modifiche su GitHub
 
