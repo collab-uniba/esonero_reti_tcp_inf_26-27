@@ -146,8 +146,8 @@ def test_server(server, client):
                 sock.sendall(payload)
                 data = recv_exactly(sock, 8)
         except OSError as e:
-            check(section, name, False, "errore di comunicazione sulla porta %d: %s (verifiche "
-                  "successive sul server saltate)" % (DEFAULT_PORT, e))
+            check(section, name, False, "errore di comunicazione sulla porta %d: %s (richieste "
+                  "successive saltate)" % (DEFAULT_PORT, e))
             break
         expected_log.append(log_line)
         if len(data) != 8:
@@ -182,6 +182,8 @@ def test_server(server, client):
     log.seek(0)
     lines = normalize(log.read()).split("\n")
     missing = [line for line in expected_log if line not in lines]
+    if not expected_log:  # no request reached the server: nothing to verify
+        return
     check(section, "log delle richieste", not missing,
           "righe mancanti o diverse, ad es. %r (righe stampate: %r). Se non stampa nulla, "
           "chiama fflush(stdout) dopo ogni printf" % (missing[0] if missing else "", lines[:3]))
@@ -310,6 +312,8 @@ def main():
     if len(sys.argv) != 3:
         print(__doc__)
         return 2
+    # On Windows a piped stdout is cp1252: avoid crashing on the student's output
+    sys.stdout.reconfigure(errors="replace")
     client, server = executable(sys.argv[1]), executable(sys.argv[2])
     test_client(client)
     test_server(server, client)
