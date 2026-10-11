@@ -126,7 +126,7 @@ ed esce con codice di uscita diverso da 0.
 ## Consegna
 
 - **Scadenza**: _TBD_
-- **Form di prenotazione / consegna**: _TBD_
+- **Form di prenotazione / consegna**: [link](https://forms.gle/RFrQTXszrHVi8uwX6) (Ctrl/Cmd-clic per aprire in una nuova scheda)
 - **Formato**: link al repository GitHub pubblico
 - **Risultati**: _TBD_
 - **Note**:
