@@ -114,7 +114,7 @@ Uso: client-project [-s server] [-p port] -r "FROM TO valore"
 ed esce con codice di uscita diverso da 0.
 
 > [!WARNING]
-> L'output deve corrispondere **carattere per carattere** a quello degli esempi: lingua italiana, spazi, punteggiatura, due cifre decimali, nessun messaggio aggiuntivo su `stdout`.
+> L'output deve corrispondere **carattere per carattere** a quello degli esempi: lingua italiana, spazi, punteggiatura, due cifre decimali, nessun messaggio aggiuntivo.
 > Se il server non è raggiungibile o la risposta non è valida (codice di stato sconosciuto), il client stampa un errore ed esce con codice di uscita diverso da 0.
 
 ## 6. Requisiti
