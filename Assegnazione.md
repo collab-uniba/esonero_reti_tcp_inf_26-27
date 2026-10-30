@@ -125,7 +125,7 @@ ed esce con codice di uscita diverso da 0.
 
 ## Consegna
 
-- **Scadenza**: _TBD_
+- **Scadenza**: domenica 22 novembre 2026, ore 23:59
 - **Form di prenotazione / consegna**: [link](https://forms.gle/RFrQTXszrHVi8uwX6) (Ctrl/Cmd-clic per aprire in una nuova scheda)
 - **Formato**: link al repository GitHub pubblico
 - **Risultati**: [link](https://collab-uniba.github.io/correzione_esonero_reti_tcp_inf_26-27/aggregate-report.html) (Ctrl/Cmd-clic per aprire in una nuova scheda)
