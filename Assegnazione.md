@@ -105,7 +105,7 @@ Server avviato con `server-project`. La colonna **Log server** riporta l'output 
 | `"g kg 0"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'g kg 0.00' dal client ip 127.0.0.1` |
 | `"lb kg 1000.01"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'lb kg 1000.01' dal client ip 127.0.0.1` |
 
-Se l'argomento di `-r` non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore negativo, non numerico, con più di due decimali o troppo grande per `uint32_t`, campi mancanti o in più), il client **non contatta il server**, stampa
+Se `-r` manca o il suo argomento non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore negativo, non numerico, con più di due decimali o troppo grande per `uint32_t`, campi mancanti o in più), il client **non contatta il server**, stampa
 
 ```
 Uso: client-project [-s server] [-p port] -r "FROM TO valore"
@@ -127,11 +127,11 @@ ed esce con codice di uscita diverso da 0.
 
 - **Scadenza**: domenica 22 novembre 2026, ore 23:59
 - **Form di prenotazione / consegna**: [link](https://forms.gle/RFrQTXszrHVi8uwX6) (Ctrl/Cmd-clic per aprire in una nuova scheda)
-- **Formato**: link al repository GitHub pubblico
+- **Formato**: link al repository GitHub **privato**, con l'utente `correttore-lab-reti` aggiunto come collaboratore in lettura (vedi README)
 - **Risultati**: [link](https://collab-uniba.github.io/correzione_esonero_reti_tcp_inf_26-27/aggregate-report.html) (Ctrl/Cmd-clic per aprire in una nuova scheda)
 - **Note**:
    - Una sola consegna per coppia
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
-   - La pagina dei risultati si aggiorna ogni 3 ore, dalle 9 alle 21
+   - La pagina dei risultati si aggiorna tre volte al giorno, alle 9, alle 15 e alle 21
 
-_Ver. 0.2.0_
+_Ver. 0.2.1_
