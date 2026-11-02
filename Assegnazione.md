@@ -43,7 +43,7 @@ Il server serve un client alla volta e non termina mai.
 
 ## 3. Unità di misura e conversione (server)
 
-Per ogni unità, la tabella riporta la grandezza e il valore di 1 unità nell'unità base della grandezza (micrometri per le lunghezze, microgrammi per le masse). Il server deve usare **esattamente** questa tabella e questa funzione:
+Per ogni unità, la tabella riporta la grandezza e il valore di 1 unità nell'unità base della grandezza (micrometri per le lunghezze, microgrammi per le masse). Il server deve usare **esattamente** questa tabella e questa funzione; i simboli distinguono maiuscole e minuscole:
 
 ```c
 typedef enum { LENGTH, MASS } quantity_t;
@@ -115,7 +115,7 @@ ed esce con codice di uscita diverso da 0.
 
 > [!WARNING]
 > L'output deve corrispondere **carattere per carattere** a quello degli esempi: lingua italiana, spazi, punteggiatura, due cifre decimali, nessun messaggio aggiuntivo.
-> Se il server non è raggiungibile o la risposta non è valida (codice di stato sconosciuto), il client stampa un errore ed esce con codice di uscita diverso da 0.
+> Se il server non è raggiungibile o la risposta non è valida (codice di stato sconosciuto), il client stampa un errore ed esce con codice di uscita diverso da 0; in tutti gli altri casi esce con codice 0.
 
 ## 6. Requisiti
 
@@ -132,6 +132,6 @@ ed esce con codice di uscita diverso da 0.
 - **Note**:
    - Una sola consegna per coppia
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
-   - La pagina dei risultati si aggiorna ogni ora
+   - La pagina dei risultati si aggiorna ogni 3 ore, dalle 9 alle 21
 
-_Ver. 0.1.0_
+_Ver. 0.2.0_
