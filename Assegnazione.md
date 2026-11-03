@@ -127,7 +127,7 @@ ed esce con codice di uscita diverso da 0.
 
 - **Scadenza**: domenica 22 novembre 2026, ore 23:59
 - **Form di prenotazione / consegna**: [link](https://forms.gle/RFrQTXszrHVi8uwX6) (Ctrl/Cmd-clic per aprire in una nuova scheda)
-- **Formato**: link al repository GitHub **privato**, con l'utente `correttore-lab-reti` aggiunto come collaboratore in lettura (vedi README)
+- **Formato**: link al repository GitHub **privato**, con l'utente `correttore-lab-reti` aggiunto come collaboratore (vedi README)
 - **Risultati**: [link](https://collab-uniba.github.io/correzione_esonero_reti_tcp_inf_26-27/aggregate-report.html) (Ctrl/Cmd-clic per aprire in una nuova scheda)
 - **Note**:
    - Una sola consegna per coppia
