@@ -14,8 +14,8 @@ La specifica è data da tre elementi, da leggere insieme:
 
 Le strutture `conversion_request_t` e `conversion_response_t`, i codici di stato e le costanti sono definiti in [`protocol.h`](client-project/src/protocol.h). Client e server si scambiano queste strutture rispettando tre regole:
 
-- il valore è un `float`: nel campo `value` viaggiano i suoi 32 bit, copiati con `memcpy()` in un `uint32_t` (vedi lezione *Costruzione di messaggi*);
-- i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio (`htonl()`) e riconvertiti dopo la ricezione (`ntohl()`);
+- il valore è un `float`: nel campo `value` viaggiano i suoi 32 bit (vedi lezione *Costruzione di messaggi*);
+- i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio e riconvertiti dopo la ricezione;
 - in caso di errore (`status != STATUS_OK`) il server invia `value = 0`.
 
 ```c
@@ -166,4 +166,4 @@ ed esce con codice di uscita diverso da 0.
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
    - La pagina dei risultati si aggiorna tre volte al giorno, alle 9, alle 15 e alle 21
 
-_Ver. 0.3.1_
+_Ver. 0.3.2_
