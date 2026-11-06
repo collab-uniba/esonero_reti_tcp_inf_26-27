@@ -18,15 +18,6 @@ Le strutture `conversion_request_t` e `conversion_response_t`, i codici di stato
 - i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio e riconvertiti dopo la ricezione;
 - in caso di errore (`status != STATUS_OK`) il server invia `value = 0`.
 
-```c
-float value = 26.2f;
-uint32_t bits;
-memcpy(&bits, &value, sizeof(bits));   // float -> 32 bit
-request.value = htonl(bits);           // host -> network byte order
-```
-
-Alla ricezione si fa il percorso inverso: `ntohl()`, poi `memcpy()` dai 32 bit al `float`.
-
 ## 2. Diagramma di sequenza
 
 ```mermaid
