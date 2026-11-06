@@ -17,7 +17,7 @@
 #define QUEUE_SIZE 5               // Size of pending connections queue (server)
 
 #define UNIT_LEN 4                 // Unit symbol: up to 3 characters + '\0'
-#define MAX_VALUE 100000u          // 1000.00 in hundredths
+#define MAX_VALUE 1000.0f          // Largest value accepted by the server
 
 // Response status codes
 #define STATUS_OK 0
@@ -29,13 +29,13 @@
 typedef struct {
     char from[UNIT_LEN];   // Source unit symbol, null-terminated (e.g. "mi")
     char to[UNIT_LEN];     // Target unit symbol, null-terminated (e.g. "km")
-    uint32_t value;        // Value in hundredths, network byte order
+    uint32_t value;        // Value: bits of a float (memcpy), network byte order
 } conversion_request_t;
 
 // Response message (server -> client), 8 bytes
 typedef struct {
     uint32_t status;       // STATUS_* code, network byte order
-    uint32_t value;        // Converted value in hundredths, network byte order
+    uint32_t value;        // Converted value: bits of a float (memcpy), network byte order
 } conversion_response_t;
 
 // Function prototypes
