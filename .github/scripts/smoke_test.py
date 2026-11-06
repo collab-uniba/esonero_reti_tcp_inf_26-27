@@ -26,11 +26,11 @@ TIMEOUT = 5
 MAX_VALUE = 1000.0
 PREFIX = "Ricevuto risultato dal server ip 127.0.0.1. "
 
-UNITS = {
-    "m": ("L", 1000000), "km": ("L", 1000000000), "ft": ("L", 304800),
-    "yd": ("L", 914400), "mi": ("L", 1609344000),
-    "g": ("M", 1000000), "kg": ("M", 1000000000), "oz": ("M", 28349523),
-    "lb": ("M", 453592370),
+UNITS = {  # (quantity, 1 unit in metres or kilograms)
+    "m": ("L", 1.0), "km": ("L", 1000.0), "ft": ("L", 0.3048),
+    "yd": ("L", 0.9144), "mi": ("L", 1609.344),
+    "g": ("M", 0.001), "kg": ("M", 1.0), "oz": ("M", 0.028349523),
+    "lb": ("M", 0.45359237),
 }
 
 # (-r argument, expected client output after PREFIX, expected server log)

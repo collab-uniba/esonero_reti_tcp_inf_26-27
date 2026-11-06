@@ -50,9 +50,34 @@ sequenceDiagram
 
 Il server serve un client alla volta e non termina mai.
 
-## 3. Unità di misura e conversione (server)
+## 3. Conversione (server)
 
-Per ogni unità, la tabella riporta la grandezza e il valore di 1 unità nell'unità base della grandezza (micrometri per le lunghezze, microgrammi per le masse). Il server deve usare **esattamente** questa tabella e questa funzione; i simboli distinguono maiuscole e minuscole:
+Il server conosce le unità della tabella. Per ogni unità, la colonna **1 unità vale** dice a quanti **metri** (lunghezze) o **chilogrammi** (masse) corrisponde:
+
+| Simbolo | Grandezza | 1 unità vale |
+|---|---|---|
+| `m` | lunghezza | 1 m |
+| `km` | lunghezza | 1000 m |
+| `ft` | lunghezza | 0.3048 m |
+| `yd` | lunghezza | 0.9144 m |
+| `mi` | lunghezza | 1609.344 m |
+| `g` | massa | 0.001 kg |
+| `kg` | massa | 1 kg |
+| `oz` | massa | 0.028349523 kg |
+| `lb` | massa | 0.45359237 kg |
+
+Ricevuta una richiesta `FROM TO valore`, il server esegue **in quest'ordine** i controlli:
+
+1. cerca `FROM` e `TO` nella tabella (maiuscole e minuscole contano: `KM` non esiste). Se uno dei due manca → `STATUS_INVALID_UNIT`;
+2. se le due unità sono di grandezze diverse (es. `km` e `kg`) → `STATUS_INCOMPATIBLE_UNITS`;
+3. se `valore` non è compreso tra 0 (escluso) e `MAX_VALUE` (incluso) → `STATUS_INVALID_VALUE`;
+4. altrimenti risponde `STATUS_OK` con il valore convertito:
+
+   **risultato = valore × fattore(FROM) / fattore(TO)**
+
+   Esempio: 26.2 mi → km = 26.2 × 1609.344 / 1000 = 42.16 km
+
+Per la tabella e il calcolo usate **esattamente** questo codice:
 
 ```c
 typedef enum { LENGTH, MASS } quantity_t;
@@ -60,22 +85,22 @@ typedef enum { LENGTH, MASS } quantity_t;
 typedef struct {
     const char *symbol;
     quantity_t quantity;
-    uint32_t factor;   // 1 unit in the base unit: micrometres (LENGTH), micrograms (MASS)
+    double factor;    // 1 unit = factor metres (LENGTH) or kilograms (MASS)
 } unit_t;
 
 static const unit_t UNITS[] = {
-    {"m",  LENGTH,    1000000}, {"km", LENGTH, 1000000000}, {"ft", LENGTH, 304800},
-    {"yd", LENGTH,     914400}, {"mi", LENGTH, 1609344000},
-    {"g",  MASS,      1000000}, {"kg", MASS,   1000000000}, {"oz", MASS,   28349523},
-    {"lb", MASS,    453592370},
+    {"m",  LENGTH, 1.0},    {"km", LENGTH, 1000.0}, {"ft", LENGTH, 0.3048},
+    {"yd", LENGTH, 0.9144}, {"mi", LENGTH, 1609.344},
+    {"g",  MASS,   0.001},  {"kg", MASS,   1.0},    {"oz", MASS,   0.028349523},
+    {"lb", MASS,   0.45359237},
 };
 
 /*
  * Converts a value from one unit to another of the same quantity.
- * Example: 26.2 mi -> km is convert(26.2f, 1609344000, 1000000000) = 42.16 km
+ * Example: 26.2 mi -> km is convert(26.2f, 1609.344, 1000.0) = 42.16 km
  */
-float convert(float value, uint32_t factor_from, uint32_t factor_to) {
-    return (float)((double)value * factor_from / factor_to);  // double: no overflow, same result on every machine
+float convert(float value, double factor_from, double factor_to) {
+    return (float)(value * factor_from / factor_to);  // double math: same result on every machine
 }
 ```
 
@@ -141,4 +166,4 @@ ed esce con codice di uscita diverso da 0.
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
    - La pagina dei risultati si aggiorna tre volte al giorno, alle 9, alle 15 e alle 21
 
-_Ver. 0.3.0_
+_Ver. 0.3.1_
