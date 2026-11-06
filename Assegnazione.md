@@ -43,19 +43,19 @@ Il server serve un client alla volta e non termina mai.
 
 ## 3. Conversione (server)
 
-Il server conosce le unità della tabella. Per ogni unità, la colonna **1 unità vale** dice a quanti **metri** (lunghezze) o **chilogrammi** (masse) corrisponde:
+Il server conosce le unità della tabella. Per ogni unità, la colonna **1 unit =** dice a quanti **metri** (`LENGTH`) o **chilogrammi** (`MASS`) corrisponde:
 
-| Simbolo | Grandezza | 1 unità vale |
+| Symbol | Quantity | 1 unit = |
 |---|---|---|
-| `m` | lunghezza | 1 m |
-| `km` | lunghezza | 1000 m |
-| `ft` | lunghezza | 0.3048 m |
-| `yd` | lunghezza | 0.9144 m |
-| `mi` | lunghezza | 1609.344 m |
-| `g` | massa | 0.001 kg |
-| `kg` | massa | 1 kg |
-| `oz` | massa | 0.028349523 kg |
-| `lb` | massa | 0.45359237 kg |
+| `m` | `LENGTH` | 1 m |
+| `km` | `LENGTH` | 1000 m |
+| `ft` | `LENGTH` | 0.3048 m |
+| `yd` | `LENGTH` | 0.9144 m |
+| `mi` | `LENGTH` | 1609.344 m |
+| `g` | `MASS` | 0.001 kg |
+| `kg` | `MASS` | 1 kg |
+| `oz` | `MASS` | 0.028349523 kg |
+| `lb` | `MASS` | 0.45359237 kg |
 
 Ricevuta una richiesta `FROM TO valore`, il server esegue **in quest'ordine** i controlli:
 
