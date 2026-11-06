@@ -14,9 +14,18 @@ La specifica è data da tre elementi, da leggere insieme:
 
 Le strutture `conversion_request_t` e `conversion_response_t`, i codici di stato e le costanti sono definiti in [`protocol.h`](client-project/src/protocol.h). Client e server si scambiano queste strutture rispettando tre regole:
 
-- i valori sono espressi **in centesimi** (es. `26.2` → `2620`);
+- il valore è un `float`: nel campo `value` viaggiano i suoi 32 bit, copiati con `memcpy()` in un `uint32_t` (vedi lezione *Costruzione di messaggi*);
 - i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio (`htonl()`) e riconvertiti dopo la ricezione (`ntohl()`);
 - in caso di errore (`status != STATUS_OK`) il server invia `value = 0`.
+
+```c
+float value = 26.2f;
+uint32_t bits;
+memcpy(&bits, &value, sizeof(bits));   // float -> 32 bit
+request.value = htonl(bits);           // host -> network byte order
+```
+
+Alla ricezione si fa il percorso inverso: `ntohl()`, poi `memcpy()` dai 32 bit al `float`.
 
 ## 2. Diagramma di sequenza
 
@@ -28,12 +37,12 @@ sequenceDiagram
     participant S as Server
 
     U->>C: client-project -r "mi km 26.2"
-    Note over C: parsing argomenti<br/>valore = 2620 centesimi
+    Note over C: parsing argomenti<br/>valore = 26.2
     C->>S: connect()
-    C->>S: conversion_request_t { "mi", "km", 2620 }
+    C->>S: conversion_request_t { "mi", "km", 26.2 }
     Note over S: stampa log richiesta
     Note over S: valida unità e valore<br/>converte con convert()
-    S->>C: conversion_response_t { STATUS_OK, 4216 }
+    S->>C: conversion_response_t { STATUS_OK, 42.16 }
     S--xC: close()
     Note over C: stampa risultato
     C--xS: close()
@@ -62,14 +71,11 @@ static const unit_t UNITS[] = {
 };
 
 /*
- * Converts a value in hundredths from one unit to another of the same quantity,
- * rounding to the nearest hundredth.
- * Example: 26.20 mi -> km is convert(2620, 1609344000, 1000000000) = 4216 (42.16 km)
+ * Converts a value from one unit to another of the same quantity.
+ * Example: 26.2 mi -> km is convert(26.2f, 1609344000, 1000000000) = 42.16 km
  */
-uint32_t convert(uint32_t value, uint32_t factor_from, uint32_t factor_to) {
-    uint64_t product = (uint64_t)value * factor_from;  // 64 bits to avoid overflow
-    uint64_t result = (product + factor_to / 2) / factor_to;  // + half the divisor: round instead of truncate
-    return (uint32_t)result;
+float convert(float value, uint32_t factor_from, uint32_t factor_to) {
+    return (float)((double)value * factor_from / factor_to);  // double: no overflow, same result on every machine
 }
 ```
 
@@ -102,10 +108,11 @@ Server avviato con `server-project`. La colonna **Log server** riporta l'output 
 | `"KM mi 1"` | `Ricevuto risultato dal server ip 127.0.0.1. Simbolo non supportato` | `Richiesta 'KM mi 1.00' dal client ip 127.0.0.1` |
 | `"m xyz 0"` | `Ricevuto risultato dal server ip 127.0.0.1. Simbolo non supportato` | `Richiesta 'm xyz 0.00' dal client ip 127.0.0.1` |
 | `"km kg 0"` | `Ricevuto risultato dal server ip 127.0.0.1. Grandezze incompatibili` | `Richiesta 'km kg 0.00' dal client ip 127.0.0.1` |
+| `"m km -5"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'm km -5.00' dal client ip 127.0.0.1` |
 | `"g kg 0"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'g kg 0.00' dal client ip 127.0.0.1` |
 | `"lb kg 1000.01"` | `Ricevuto risultato dal server ip 127.0.0.1. Valore non valido` | `Richiesta 'lb kg 1000.01' dal client ip 127.0.0.1` |
 
-Se `-r` manca o il suo argomento non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore negativo, non numerico, con più di due decimali o troppo grande per `uint32_t`, campi mancanti o in più), il client **non contatta il server**, stampa
+Se `-r` manca o il suo argomento non è nel formato `"FROM TO valore"` (simbolo più lungo di 3 caratteri, valore non numerico, campi mancanti o in più), il client **non contatta il server**, stampa
 
 ```
 Uso: client-project [-s server] [-p port] -r "FROM TO valore"
@@ -134,4 +141,4 @@ ed esce con codice di uscita diverso da 0.
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
    - La pagina dei risultati si aggiorna tre volte al giorno, alle 9, alle 15 e alle 21
 
-_Ver. 0.2.1_
+_Ver. 0.3.0_

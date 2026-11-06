@@ -14,16 +14,16 @@ import socket
 import struct
 import subprocess
 import sys
+import math
 import tempfile
 import time
-from decimal import Decimal
 
 HOST = "127.0.0.1"
 DEFAULT_PORT = 56700
 REF_PORT = 56701
 CLOSED_PORT = 56702
 TIMEOUT = 5
-MAX_VALUE = 100000
+MAX_VALUE = 1000.0
 PREFIX = "Ricevuto risultato dal server ip 127.0.0.1. "
 
 UNITS = {
@@ -46,13 +46,15 @@ CASES = [
     ("KM mi 1", "Simbolo non supportato", "Richiesta 'KM mi 1.00' dal client ip 127.0.0.1"),
     ("m xyz 0", "Simbolo non supportato", "Richiesta 'm xyz 0.00' dal client ip 127.0.0.1"),
     ("km kg 0", "Grandezze incompatibili", "Richiesta 'km kg 0.00' dal client ip 127.0.0.1"),
+    ("m km -5", "Valore non valido", "Richiesta 'm km -5.00' dal client ip 127.0.0.1"),
     ("g kg 0", "Valore non valido", "Richiesta 'g kg 0.00' dal client ip 127.0.0.1"),
     ("lb kg 1000.01", "Valore non valido", "Richiesta 'lb kg 1000.01' dal client ip 127.0.0.1"),
 ]
 
-USAGE_CASES = ["mile km 10", "m km 1.234", "m km 10,50", "m km -5", "m km 42949673", "m km", "m km 10 20"]
+USAGE_CASES = ["mile km 10", "m km abc", "m km 10,50", "m km", "m km 10 20"]
 
 BYTE_ORDER_HINT = "sembra un errore di byte order: hai usato htonl()/ntohl()?"
+FLOAT_HINT = "sembra che il float sia stato convertito in intero: vanno copiati i suoi bit con memcpy()"
 
 results = []  # (section, name, ok, detail)
 
@@ -62,9 +64,19 @@ def check(section, name, ok, detail=""):
     print("[%s] %s: %s%s" % ("OK" if ok else "FAIL", section, name, "" if ok else " -> " + detail))
 
 
+def to_float32(x):
+    """Round a Python float to IEEE 754 single precision, like a C float."""
+    return struct.unpack("!f", struct.pack("!f", x))[0]
+
+
+def same_float(a, b):
+    """Equal up to one float32 rounding (compilers may differ in the last bit)."""
+    return math.isclose(a, b, rel_tol=1e-6, abs_tol=1e-6)
+
+
 def parse_request(req):
     frm, to, value = req.split(" ")
-    return frm, to, int(Decimal(value) * 100)
+    return frm, to, to_float32(float(value))
 
 
 def reference_response(frm, to, value):
@@ -73,10 +85,10 @@ def reference_response(frm, to, value):
         return 1, 0
     if unit_from[0] != unit_to[0]:
         return 2, 0
-    if value == 0 or value > MAX_VALUE:
-        return 3, 0
+    if not (value > 0 and value <= MAX_VALUE):
+        return 3, 0.0
     factor_from, factor_to = unit_from[1], unit_to[1]
-    return 0, (value * factor_from + factor_to // 2) // factor_to
+    return 0, to_float32(value * factor_from / factor_to)  # convert(): double math, float result
 
 
 def recv_exactly(sock, n):
@@ -148,7 +160,7 @@ def test_server(server, client):
     expected_log = []
     for req, _, log_line in CASES:
         frm, to, value = parse_request(req)
-        payload = struct.pack("!4s4sI", frm.encode(), to.encode(), value)
+        payload = struct.pack("!4s4sf", frm.encode(), to.encode(), value)
         name = "risposta a '%s'" % req
         try:
             with connect_with_retry(DEFAULT_PORT) as sock:
@@ -162,15 +174,18 @@ def test_server(server, client):
         if len(data) != 8:
             check(section, name, False, "ricevuti %d byte invece di 8" % len(data))
             continue
-        got = struct.unpack("!II", data)
+        got = struct.unpack("!If", data)
         expected = reference_response(frm, to, value)
-        if got == expected:
+        if got[0] == expected[0] and same_float(got[1], expected[1]):
             check(section, name, True)
         else:
-            detail = "status/value = %s, attesi %s" % (got, expected)
-            status_le = struct.unpack("<I", data[0:4])[0]
-            if struct.unpack("<II", data) == expected or (got[0] > 3 and status_le <= 3):
+            detail = "status/value = (%d, %g), attesi (%d, %g)" % (got[0], got[1], expected[0], expected[1])
+            got_le = struct.unpack("<If", data)
+            if (got_le[0] == expected[0] and same_float(got_le[1], expected[1])) \
+                    or (got[0] > 3 and got_le[0] <= 3):
                 detail += "; " + BYTE_ORDER_HINT
+            elif got[0] == expected[0] and struct.unpack("!I", data[4:8])[0] == int(expected[1]):
+                detail += "; " + FLOAT_HINT
             check(section, name, False, detail)
 
     # End-to-end: student client against student server, default address and port
@@ -206,8 +221,8 @@ def serve_reference(conn):
         if len(data) == 12:
             frm = data[0:4].split(b"\0")[0].decode("ascii", errors="replace")
             to = data[4:8].split(b"\0")[0].decode("ascii", errors="replace")
-            value = struct.unpack("!I", data[8:12])[0]
-            conn.sendall(struct.pack("!II", *reference_response(frm, to, value)))
+            value = struct.unpack("!f", data[8:12])[0]
+            conn.sendall(struct.pack("!If", *reference_response(frm, to, value)))
         return data
 
 
@@ -253,11 +268,13 @@ def check_request(data, frm, to, value):
     got_to = data[4:8].split(b"\0")[0].decode("ascii", "replace")
     if (got_from, got_to) != (frm, to):
         return "simboli ricevuti %r, attesi %r" % ((got_from, got_to), (frm, to))
-    got = struct.unpack("!I", data[8:12])[0]
-    if got != value:
-        detail = "value ricevuto %d, atteso %d" % (got, value)
-        if struct.unpack("<I", data[8:12])[0] == value:
+    got = struct.unpack("!f", data[8:12])[0]
+    if not same_float(got, value):
+        detail = "value ricevuto %g, atteso %g" % (got, value)
+        if same_float(struct.unpack("<f", data[8:12])[0], value):
             detail += "; " + BYTE_ORDER_HINT
+        elif struct.unpack("!I", data[8:12])[0] == int(value):
+            detail += "; " + FLOAT_HINT
         return detail
     return None
 
