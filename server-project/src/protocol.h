@@ -29,13 +29,13 @@
 typedef struct {
     char from[UNIT_LEN];   // Source unit symbol, null-terminated (e.g. "mi")
     char to[UNIT_LEN];     // Target unit symbol, null-terminated (e.g. "km")
-    uint32_t value;        // Value: bits of a float (memcpy), network byte order
+    uint32_t value;        // Value: bits of a float, network byte order
 } conversion_request_t;
 
 // Response message (server -> client), 8 bytes
 typedef struct {
     uint32_t status;       // STATUS_* code, network byte order
-    uint32_t value;        // Converted value: bits of a float (memcpy), network byte order
+    uint32_t value;        // Converted value: bits of a float, network byte order
 } conversion_response_t;
 
 // Function prototypes
