@@ -14,18 +14,9 @@ La specifica è data da tre elementi, da leggere insieme:
 
 Le strutture `conversion_request_t` e `conversion_response_t`, i codici di stato e le costanti sono definiti in [`protocol.h`](client-project/src/protocol.h). Client e server si scambiano queste strutture rispettando tre regole:
 
-- il valore è un `float`: nel campo `value` viaggiano i suoi 32 bit, copiati con `memcpy()` in un `uint32_t` (vedi lezione *Costruzione di messaggi*);
-- i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio (`htonl()`) e riconvertiti dopo la ricezione (`ntohl()`);
+- il valore è un `float`: nel campo `value` viaggiano i suoi 32 bit (vedi lezione *Costruzione di messaggi*);
+- i campi `uint32_t` vanno convertiti in **network byte order** prima dell'invio e riconvertiti dopo la ricezione;
 - in caso di errore (`status != STATUS_OK`) il server invia `value = 0`.
-
-```c
-float value = 26.2f;
-uint32_t bits;
-memcpy(&bits, &value, sizeof(bits));   // float -> 32 bit
-request.value = htonl(bits);           // host -> network byte order
-```
-
-Alla ricezione si fa il percorso inverso: `ntohl()`, poi `memcpy()` dai 32 bit al `float`.
 
 ## 2. Diagramma di sequenza
 
@@ -52,19 +43,19 @@ Il server serve un client alla volta e non termina mai.
 
 ## 3. Conversione (server)
 
-Il server conosce le unità della tabella. Per ogni unità, la colonna **1 unità vale** dice a quanti **metri** (lunghezze) o **chilogrammi** (masse) corrisponde:
+Il server conosce le unità della tabella. Per ogni unità, la colonna **1 unit =** dice a quanti **metri** (`LENGTH`) o **chilogrammi** (`MASS`) corrisponde:
 
-| Simbolo | Grandezza | 1 unità vale |
+| Symbol | Quantity | 1 unit = |
 |---|---|---|
-| `m` | lunghezza | 1 m |
-| `km` | lunghezza | 1000 m |
-| `ft` | lunghezza | 0.3048 m |
-| `yd` | lunghezza | 0.9144 m |
-| `mi` | lunghezza | 1609.344 m |
-| `g` | massa | 0.001 kg |
-| `kg` | massa | 1 kg |
-| `oz` | massa | 0.028349523 kg |
-| `lb` | massa | 0.45359237 kg |
+| `m` | `LENGTH` | 1 m |
+| `km` | `LENGTH` | 1000 m |
+| `ft` | `LENGTH` | 0.3048 m |
+| `yd` | `LENGTH` | 0.9144 m |
+| `mi` | `LENGTH` | 1609.344 m |
+| `g` | `MASS` | 0.001 kg |
+| `kg` | `MASS` | 1 kg |
+| `oz` | `MASS` | 0.028349523 kg |
+| `lb` | `MASS` | 0.45359237 kg |
 
 Ricevuta una richiesta `FROM TO valore`, il server esegue **in quest'ordine** i controlli:
 
@@ -166,4 +157,4 @@ ed esce con codice di uscita diverso da 0.
    - Non è necessario ricompilare il form di consegna dopo aggiornamenti al repository
    - La pagina dei risultati si aggiorna tre volte al giorno, alle 9, alle 15 e alle 21
 
-_Ver. 0.3.1_
+_Ver. 0.3.2_
