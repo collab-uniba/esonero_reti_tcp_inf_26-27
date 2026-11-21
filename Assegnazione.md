@@ -70,6 +70,7 @@ Ricevuta una richiesta `FROM TO valore`, il server esegue **in quest'ordine** i 
 
 Per la tabella e il calcolo usate **esattamente** questo codice:
 
+<!-- codice-imposto -->
 ```c
 typedef enum { LENGTH, MASS } quantity_t;
 
